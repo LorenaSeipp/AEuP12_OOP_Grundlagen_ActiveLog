@@ -1,0 +1,68 @@
+name: CI
+
+# Läuft an jedem Pull Request – nicht bei einem Push ohne PR.
+# Der Status (grün/rot) erscheint direkt am Pull Request -> formatives Feedback.
+#
+# Es laufen nur die Abnahmetests der Story(s), die der PR betrifft.
+# Die Story-Nummer wird aus dem PR-Titel gelesen ("Story 03: Intensität abgesichert"),
+# ersatzweise aus dem Branch-Namen ("story03"), sonst aus den Commits
+# (ein PR mit Story 6 und 7 -> Tests von Story 6 und 7).
+# Details: .github/scripts/stories.sh. Ist keine Story erkennbar, laufen alle Tests.
+on:
+  pull_request:
+    # "edited": Wird der PR-Titel korrigiert, startet die CI mit der neuen Story neu.
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Volle Historie, damit die Story-Nummern aus den Commits gelesen werden können.
+          fetch-depth: 0
+
+      - name: Story ermitteln
+        id: story
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          stories=$(bash .github/scripts/stories.sh)
+
+          if [ -n "$stories" ]; then
+            filter=""
+            for n in $stories; do
+              filter="${filter:+$filter|}FullyQualifiedName~ActiveLog.Abnahme.Story${n}_"
+            done
+            echo "Story $stories erkannt – es laufen nur deren Abnahmetests."
+            echo "filter=$filter" >> "$GITHUB_OUTPUT"
+            echo "### Abnahme: Story $stories" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Keine Story-Nummer im PR-Titel, Branch-Namen oder in den Commits gefunden – es laufen ALLE Tests. Benenne den PR z. B. 'Story 03: Intensität abgesichert'."
+            echo "filter=" >> "$GITHUB_OUTPUT"
+            echo "### Abnahme: alle Stories" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: .NET einrichten
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Abhängigkeiten wiederherstellen
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Tests
+        env:
+          FILTER: ${{ steps.story.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            dotnet test --no-build --configuration Release --verbosity normal --filter "$FILTER"
+          else
+            dotnet test --no-build --configuration Release --verbosity normal
+          fi

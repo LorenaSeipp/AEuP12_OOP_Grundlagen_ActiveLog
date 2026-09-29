@@ -1,0 +1,129 @@
+name: Mebis-Abgabe-Beleg
+
+# Erzeugt am Abgabe-PR einen kopierbaren "Beleg"-Block mit Was / Stand / Wo / Wann.
+# Die Schüler:in trägt diesen Block in die Mebis-Aufgabe (Abgabetyp "Online-Text") ein.
+# Der Beleg wird als PR-Kommentar gepostet und bei jedem Push automatisch aktualisiert.
+# Hier in GitHub bleibt der Code – in Mebis steht ausschließlich dieser Metadaten-Beleg.
+on:
+  pull_request:
+    # Nur auslösen, wenn der PR auf main zielt (Base-Branch).
+    branches: [main]
+    # "edited": Wird der PR-Titel korrigiert, wird die Story neu erkannt.
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+# Minimalrechte: nur PR-Kommentare schreiben, Inhalte lesen.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  beleg:
+    runs-on: ubuntu-latest
+    # Soll nie die eigentliche CI-Bewertung (Build/Tests) blockieren.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Volle Historie, damit die Story-Nummern aus den Commits gelesen werden können.
+          fetch-depth: 0
+
+      # Ein Beleg ist nur für die Mebis-Abgaben nötig: Story 4, 7 und 9.
+      # Story aus PR-Titel, Branch-Namen oder Commits – wie in ci.yml (.github/scripts/stories.sh).
+      # Ein PR, der Story 6 und 7 zusammen enthält, bekommt also einen Beleg.
+      - name: Story ermitteln
+        id: story
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          stories=$(bash .github/scripts/stories.sh)
+
+          abgabe=false
+          for n in $stories; do
+            case "$n" in 04|07|09) abgabe=true ;; esac
+          done
+
+          if [ "$abgabe" = true ]; then
+            echo "Story $stories enthält eine Mebis-Abgabe – Beleg wird erzeugt."
+          else
+            echo "Story '${stories:-keine}' enthält keine Mebis-Abgabe (nur Story 4, 7, 9) – kein Beleg."
+          fi
+          echo "abgabe=$abgabe" >> "$GITHUB_OUTPUT"
+          echo "nummer=$stories" >> "$GITHUB_OUTPUT"
+
+      - name: Beleg erzeugen und als PR-Kommentar posten
+        if: steps.story.outputs.abgabe == 'true'
+        uses: actions/github-script@v9
+        env:
+          STORY: ${{ steps.story.outputs.nummer }}
+        with:
+          script: |
+            const pr       = context.payload.pull_request;
+            const owner    = context.repo.owner;
+            const repo     = context.repo.repo;
+            const sha      = pr.head.sha;
+            const shortSha = sha.substring(0, 7);
+
+            // "Stand vom" = Zeitpunkt des Head-Commits (echter Stand der Abgabe).
+            let standVom = "(unbekannt)";
+            try {
+              const c = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+              standVom = c.data.commit.committer.date;
+            } catch (e) {
+              core.warning("Commit-Datum nicht abrufbar: " + e.message);
+            }
+
+            const prStatus = pr.draft
+              ? "Entwurf (in Bearbeitung)"
+              : "Bereit zur Abgabe (Ready for review)";
+            const nowIso = new Date().toISOString();
+
+            // Plain-Text-Block zum 1:1-Einfügen in die Mebis-Aufgabe.
+            const block = [
+              "Abgabe-Beleg (B3 / GitHub Classroom)",
+              `Aufgabe/Repo : ${repo}`,
+              `Story        : ${process.env.STORY}`,
+              `Stand-Commit : ${shortSha}  (${sha})`,
+              `Stand vom    : ${standVom}`,
+              `PR-Status    : ${prStatus}`,
+              `Pull Request : ${pr.html_url}`,
+              `Repository   : ${context.payload.repository.html_url}`,
+              `Beleg erzeugt: ${nowIso}`,
+            ].join("\n");
+
+            const marker = "<!-- mebis-abgabe-beleg -->";
+            const body = [
+              marker,
+              "## Mebis-Abgabe-Beleg",
+              "",
+              "Kopiere den folgenden Block in die **Mebis-Aufgabe** (Abgabetyp *Online-Text*) und",
+              "klicke dort auf **„Abgeben“**. Der Block aktualisiert sich bei jedem Push automatisch –",
+              "nimm beim Einreichen einfach die jeweils aktuelle Fassung.",
+              "",
+              "```text",
+              block,
+              "```",
+              "",
+              "> **Hinweis**: Der **offizielle Abgabezeitpunkt** ist deine **Mebis-Abgabezeit** zusammen mit",
+              "> **„Ready for review“** an diesem Pull Request. Der Code bleibt hier in GitHub – in",
+              "> Mebis steht nur dieser Beleg (kein Quellcode).",
+            ].join("\n");
+
+            // Bestehenden Beleg-Kommentar finden (per Marker) und aktualisieren, sonst neu anlegen.
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: pr.number, per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
+
+            // Beleg zusätzlich in die Job-Zusammenfassung schreiben (Run-Übersicht).
+            await core.summary
+              .addHeading("Mebis-Abgabe-Beleg")
+              .addCodeBlock(block, "text")
+              .write();

@@ -1,0 +1,10 @@
+# Die Lehrkraft wird automatisch als Reviewer jedes Story-Pull-Requests eingetragen –
+# für Feedback, nicht als Freigabe: Die SuS mergen ihren PR selbst, sobald die CI grün ist.
+#
+# <lehrer-handle> durch den GitHub-Benutzernamen der Lehrkraft ersetzen,
+# z. B.  * @mmustermann
+# Alternativ ein Team verwenden, z. B.  * @B3-AWP/lehrkraefte
+#
+# Die Branch-Protection von main darf deshalb KEIN Review verlangen
+# (b3.py protect-branches ohne --require-review): PR ja, Freigabe nein.
+* @JMartinCreuzburg
