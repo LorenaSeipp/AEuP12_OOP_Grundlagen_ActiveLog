@@ -34,5 +34,15 @@ public class Kraftuebung
     public void Deaktivieren()
     {
         IstAktiv = false;
+        Intensitaet = 0;
+    }
+
+    public string Statuszeile()
+    {
+        string statuszeile;
+        
+        statuszeile = IstAktiv ?  $"{Name}: aktiv ({_intensitaet} %)" : $"{Name}: pausiert";
+
+        return statuszeile;
     }
 }

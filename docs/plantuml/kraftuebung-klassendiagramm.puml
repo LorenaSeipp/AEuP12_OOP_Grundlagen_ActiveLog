@@ -12,6 +12,7 @@ class Kraftuebung
 + Kraftuebung(name : string, intensitaet : int)
 + Aktivieren() : void
 + Deaktivieren(): void
++ Statuszeile() : string 
 }
 
 @enduml
