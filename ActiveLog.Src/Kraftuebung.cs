@@ -40,7 +40,14 @@ public class Kraftuebung
     {
         string statuszeile;
 
-        statuszeile = IstAktiv ? $"{Name}: aktiv ({_intensitaet} %)" : $"{Name}: pausiert";
+        if (IstAktiv)
+        {
+            statuszeile = $"{Name}: aktiv ({_intensitaet} %)";
+        }
+        else
+        {
+            statuszeile = $"{Name}: pausiert";
+        }
 
         return statuszeile;
     }
