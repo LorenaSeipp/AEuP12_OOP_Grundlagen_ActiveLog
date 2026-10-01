@@ -20,8 +20,8 @@ Tool zeichnest.
 +-------------------------+       Komposition:    Ganzes *--- Teil
 ```
 
-## Dein Diagramm (Stand: Story ___)
+## Dein Diagramm (Stand: Story 01)
 
 ```
-(Hier entsteht dein Diagramm — Story für Story.)
+![Klassendiagramm ActiveLog 2.0](docs/plantuml/story01-kraftuebung-klassendiagramm.png)
 ```
