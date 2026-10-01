@@ -5,7 +5,10 @@
 class Kraftuebung 
 {
 + Name: string {readOnly}
++ IstAktiv: bool {readOnly}
 + Kraftuebung(name : string)
++ Aktivieren() : void
++ Deaktivieren(): void
 }
 
 @enduml
