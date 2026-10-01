@@ -1,0 +1,11 @@
+
+@startuml 
+!include style.puml
+
+class Kraftuebung 
+{
++ Name: string {readOnly}
++ Kraftuebung(name : string)
+}
+
+@enduml
