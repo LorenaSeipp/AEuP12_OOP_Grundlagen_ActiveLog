@@ -22,4 +22,4 @@ Tool zeichnest.
 
 ## Dein Diagramm (Stand: Story 01)
 
-![Klassendiagramm ActiveLog 2.0](plantuml/story02-kraftuebung-klassendiagramm.png)
+![Klassendiagramm ActiveLog 2.0](plantuml/story03-kraftuebung-klassendiagramm.png)
