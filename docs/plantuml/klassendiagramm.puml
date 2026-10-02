@@ -1,0 +1,39 @@
+
+@startuml 
+!include style.puml
+
+class Uebung 
+{
+- _intensitaet : int
++ Name: string {readOnly}
++ IstAktiv: bool {readOnly}
++ Intensitaet : int {0..100}
++ Uebung(name : string)
++ Uebung(name : string, intensitaet : int)
++ Aktivieren() : void
++ Deaktivieren(): void
++ Stauszeile() : string 
+}
+
+class Kraftuebung {
++ Kraftuebung(name: string) 
++ Kraftuebung(name : string, intensitaet : int) 
+}
+
+class Mobilityuebung {
+- _startZeit : DateTime 
++SollDauerInSek : int {readOnly}
++IstDauerInSek : int {readOnly}
++ZeitTrackingLaeuft : bool 
++Mobilityuebung(name:string) 
++Mobilityuebung(name : string, intensitaet : int) 
++Mobilityuebung(name : string, intensitaet : int, sollDauerInSek : int) 
++StarteZeitTracking() : void
++StoppeZeitTracking() : void
+-AktuelleTrainingsZeitInSek() : int
+}
+
+Uebung <|-- Kraftuebung 
+Uebung <|-- Mobilityuebung 
+
+@enduml
