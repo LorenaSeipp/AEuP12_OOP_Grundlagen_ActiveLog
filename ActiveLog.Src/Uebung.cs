@@ -1,6 +1,6 @@
 namespace ActiveLog.Src;
 
-public class Uebung
+public abstract class Uebung
 {
     private int _intensitaet;
     public string Name { get; }

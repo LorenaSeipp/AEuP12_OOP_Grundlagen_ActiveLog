@@ -1,8 +1,10 @@
 namespace ActiveLog.Src;
 
-public class Laufeinheit : Uebung
+public class Laufeinheit : Uebung, ISensor
 {
     private int _zielpuls = 130;
+    private int _messwert = 130; 
+    public int Messwert { get => _messwert; private set =>  _messwert = value; }
 
     public int Zielpuls
     {
@@ -13,12 +15,8 @@ public class Laufeinheit : Uebung
     public Laufeinheit(string name) : base(name)
     {
     }
-
-    public Laufeinheit(string name, int intensitaet) : base(name, intensitaet)
-    {
-    }
-
-    public Laufeinheit(string name, int intensitaet, int zielpuls) : base(name, intensitaet)
+    
+    public Laufeinheit(string name,  int zielpuls) : base(name)
     {
         Zielpuls = zielpuls;
     }
@@ -37,5 +35,18 @@ public class Laufeinheit : Uebung
         }
 
         return statuszeile;
+    }
+    
+    public string LiesMesswert()
+    {
+        return $"{_messwert} bpm"; 
+    }
+
+    public void MessePuls(int schlaege)
+    {
+        if (IstAktiv)
+        {
+            _messwert = schlaege;
+        }
     }
 }
