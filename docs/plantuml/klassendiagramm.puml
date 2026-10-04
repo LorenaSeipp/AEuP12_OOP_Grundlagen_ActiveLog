@@ -20,6 +20,14 @@ class Kraftuebung {
 + Kraftuebung(name : string, intensitaet : int) 
 }
 
+class Laufeinheit {
+- _zielpuls : int
++ Zielpuls : int
++ Laufeinheit(name: string) 
++ Laufeinheit(name : string, intensitaet : int)
++ Laufeinheit(name : string, intensitaet : int, zielpuls: int) 
+}
+
 class Mobilityuebung {
 - _startZeit : DateTime 
 +SollDauerInSek : int {readOnly}
@@ -35,5 +43,7 @@ class Mobilityuebung {
 
 Uebung <|-- Kraftuebung 
 Uebung <|-- Mobilityuebung 
+Uebung <|-- Laufeinheit 
+
 
 @enduml
