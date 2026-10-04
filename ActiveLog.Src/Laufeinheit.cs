@@ -22,4 +22,20 @@ public class Laufeinheit : Uebung
     {
         Zielpuls = zielpuls;
     }
+
+    public override string Statuszeile()
+    {
+        string statuszeile;
+
+        if (IstAktiv)
+        {
+            statuszeile = $"{Name}: aktiv (Zielpuls {_zielpuls} bpm)";
+        }
+        else
+        {
+            statuszeile = $"{Name}: pausiert";
+        }
+
+        return statuszeile;
+    }
 }
