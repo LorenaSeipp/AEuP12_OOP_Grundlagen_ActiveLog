@@ -20,6 +20,6 @@ Tool zeichnest.
 +-------------------------+       Komposition:    Ganzes *--- Teil
 ```
 
-## Dein Diagramm (Stand: Sprint 01)
+## Dein Diagramm (Stand: Story 05)
 
-![Klassendiagramm ActiveLog 2.0](plantuml/sprint01-klassendiagramm.png)
+![Klassendiagramm ActiveLog 2.0](plantuml/story05-klassendiagramm.png)
