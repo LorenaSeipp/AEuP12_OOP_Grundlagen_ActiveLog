@@ -18,6 +18,7 @@ class Uebung
 class Kraftuebung {
 + Kraftuebung(name: string) 
 + Kraftuebung(name : string, intensitaet : int) 
++ Stauszeile() : string  {override}
 }
 
 class Laufeinheit {
@@ -26,6 +27,7 @@ class Laufeinheit {
 + Laufeinheit(name: string) 
 + Laufeinheit(name : string, intensitaet : int)
 + Laufeinheit(name : string, intensitaet : int, zielpuls: int) 
++ Stauszeile() : string  {override}
 }
 
 class Mobilityuebung {
@@ -36,6 +38,7 @@ class Mobilityuebung {
 +Mobilityuebung(name:string) 
 +Mobilityuebung(name : string, intensitaet : int) 
 +Mobilityuebung(name : string, intensitaet : int, sollDauerInSek : int) 
++ Stauszeile() : string  {override}
 +StarteZeitTracking() : void
 +StoppeZeitTracking() : void
 -AktuelleTrainingsZeitInSek() : int
