@@ -2,7 +2,10 @@
 @startuml 
 !include style.puml
 
-class Uebung 
+interface ISensor <<interface>> {
++LiesMesswert(): string
+}
+abstract class Uebung <<abstract>>
 {
 - _intensitaet : int
 + Name: string {readOnly}
@@ -12,22 +15,32 @@ class Uebung
 + Uebung(name : string, intensitaet : int)
 + Aktivieren() : void
 + Deaktivieren(): void
-+ Stauszeile() : string 
++ Statuszeile() : string {virtual}
 }
 
 class Kraftuebung {
 + Kraftuebung(name: string) 
 + Kraftuebung(name : string, intensitaet : int) 
-+ Stauszeile() : string  {override}
++ Statuszeile() : string  {override}
 }
 
 class Laufeinheit {
-- _zielpuls : int
+- _zielpuls : int {90.. 180}
 + Zielpuls : int
 + Laufeinheit(name: string) 
-+ Laufeinheit(name : string, intensitaet : int)
-+ Laufeinheit(name : string, intensitaet : int, zielpuls: int) 
-+ Stauszeile() : string  {override}
++ Laufeinheit(name : string, zielpuls: int) 
++ Statuszeile() : string  {override}
++LiesMesswert(): string 
++MessePuls(schlaege : int): void
+}
+
+class Schwimmeinheit {
+- _anzahlBahnen : int 
++ AnzahlBahnen : int
++ Schwimmeinheit(name: string) 
++ Statuszeile() : string  {override}
++LiesMesswert(): string 
++MeldeBahnen(): void
 }
 
 class Mobilityuebung {
@@ -36,17 +49,21 @@ class Mobilityuebung {
 +IstDauerInSek : int {readOnly}
 +ZeitTrackingLaeuft : bool 
 +Mobilityuebung(name:string) 
-+Mobilityuebung(name : string, intensitaet : int) 
-+Mobilityuebung(name : string, intensitaet : int, sollDauerInSek : int) 
-+ Stauszeile() : string  {override}
++Mobilityuebung(name : string, sollDauerInSek : int) 
++Statuszeile() : string  {override}
 +StarteZeitTracking() : void
 +StoppeZeitTracking() : void
 -AktuelleTrainingsZeitInSek() : int
++LiesMesswert(): string 
 }
 
 Uebung <|-- Kraftuebung 
 Uebung <|-- Mobilityuebung 
 Uebung <|-- Laufeinheit 
+Uebung <|-- Schwimmeinheit
+ISensor <|.. Laufeinheit 
+ISensor <|.. Mobilityuebung
+ISensor <|.. Schwimmeinheit
 
 
 @enduml
