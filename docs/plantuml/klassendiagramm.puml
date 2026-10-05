@@ -57,6 +57,17 @@ class Mobilityuebung {
 +LiesMesswert(): string 
 }
 
+class Trainingseinheit {
+- uebungen : List<Uebung>
++ string Name {readOnly}
++ AnzahlUebungen {readOnly}
++ Trainingseinheit(string name)
++UebungHinzufuegen(Uebung uebung)
++AllesDeaktivieren() 
++Statusbericht() : string 
+}
+
+
 Uebung <|-- Kraftuebung 
 Uebung <|-- Mobilityuebung 
 Uebung <|-- Laufeinheit 
@@ -64,6 +75,8 @@ Uebung <|-- Schwimmeinheit
 ISensor <|.. Laufeinheit 
 ISensor <|.. Mobilityuebung
 ISensor <|.. Schwimmeinheit
+Trainingseinheit "1" o-- "0..*" Uebung
+
 
 
 @enduml
