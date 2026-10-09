@@ -36,9 +36,9 @@ public class Trainingseinheit
         {
                 string uebungBericht = string.Join(Environment.NewLine,
                     uebungen.Select(u =>
-                        $"- {u.Statuszeile()}"));
+                        $"  - {u.Statuszeile()}"));
 
-            return $"Einheit {Name}:\n{uebungBericht}";
+            return $"Einheit {Name}:\n {uebungBericht}";
         }
 
         return $"Einheit {Name} hat keine Übungen.";
