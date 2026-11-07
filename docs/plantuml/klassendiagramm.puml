@@ -1,82 +1,115 @@
-
-@startuml 
+@startuml
 !include style.puml
 
 interface ISensor <<interface>> {
-+LiesMesswert(): string
+    +LiesMesswert(): string
 }
-abstract class Uebung <<abstract>>
-{
-- _intensitaet : int
-+ Name: string {readOnly}
-+ IstAktiv: bool {readOnly}
-+ Intensitaet : int {0..100}
-+ Uebung(name : string)
-+ Uebung(name : string, intensitaet : int)
-+ Aktivieren() : void
-+ Deaktivieren(): void
-+ Statuszeile() : string {virtual}
+
+class Einstellung {
+    +Intensitaet : int?
+    +Zielpuls : int?
+    +SollAnzahlBahnen : int?
+}
+
+abstract class Uebung <<abstract>> {
+    -_intensitaet : int
+    +Name : string {readOnly}
+    +IstAktiv : bool {readOnly}
+    +Intensitaet : int {0..100}
+    +Uebung(name : string)
+    +Uebung(name : string, intensitaet : int)
+    +Aktivieren() : void
+    +Deaktivieren() : void
+    +Einstellen(einstellung : Einstellung) : void {virtual}
+    +Statuszeile() : string {virtual}
 }
 
 class Kraftuebung {
-+ Kraftuebung(name: string) 
-+ Kraftuebung(name : string, intensitaet : int) 
-+ Statuszeile() : string  {override}
+    +Kraftuebung(name : string)
+    +Kraftuebung(name : string, intensitaet : int)
+    +Statuszeile() : string {override}
+    +Einstellen(einstellung : Einstellung) : void {override}
 }
 
 class Laufeinheit {
-- _zielpuls : int {90.. 180}
-+ Zielpuls : int
-+ Laufeinheit(name: string) 
-+ Laufeinheit(name : string, zielpuls: int) 
-+ Statuszeile() : string  {override}
-+LiesMesswert(): string 
-+MessePuls(schlaege : int): void
+    -_zielpuls : int {90..180}
+    -_messwert : int
+    +Messwert : int {readOnly}
+    +Zielpuls : int {90..180}
+    +Laufeinheit(name : string)
+    +Laufeinheit(name : string, zielpuls : int)
+    +Statuszeile() : string {override}
+    +LiesMesswert() : string
+    +MessePuls(schlaege : int) : void
+    +Einstellen(einstellung : Einstellung) : void {override}
 }
 
 class Schwimmeinheit {
-- _anzahlBahnen : int 
-+ AnzahlBahnen : int
-+ Schwimmeinheit(name: string) 
-+ Statuszeile() : string  {override}
-+LiesMesswert(): string 
-+MeldeBahnen(): void
+    -_anzahlBahnen : int
+    +SollAnzahlBahnen : int {readOnly}
+    +AnzahlBahnen : int {readOnly}
+    +Schwimmeinheit(name : string)
+    +Statuszeile() : string {override}
+    +LiesMesswert() : string
+    +MeldeBahn() : int
+    +Einstellen(einstellung : Einstellung) : void {override}
 }
 
 class Mobilityuebung {
-- _startZeit : DateTime 
-+SollDauerInSek : int {readOnly}
-+IstDauerInSek : int {readOnly}
-+ZeitTrackingLaeuft : bool 
-+Mobilityuebung(name:string) 
-+Mobilityuebung(name : string, sollDauerInSek : int) 
-+Statuszeile() : string  {override}
-+StarteZeitTracking() : void
-+StoppeZeitTracking() : void
--AktuelleTrainingsZeitInSek() : int
-+LiesMesswert(): string 
+    -_startZeit : DateTime?
+    +SollDauerInSek : int {readOnly}
+    +ZeitTrackingLaeuft : bool {readOnly}
+    +LetzteDauerInSek : int {readOnly}
+    +Mobilityuebung(name : string)
+    +Mobilityuebung(name : string, intensitaet : int)
+    +Mobilityuebung(name : string, intensitaet : int, sollDauerInSek : int)
+    +StarteZeitTracking() : void
+    +StoppeZeitTracking() : void
+    +Statuszeile() : string {override}
+    +LiesMesswert() : string
+    -AktuelleTrainingInSek() : int
 }
 
 class Trainingseinheit {
-- uebungen : List<Uebung>
-+ string Name {readOnly}
-+ AnzahlUebungen {readOnly}
-+ Trainingseinheit(string name)
-+UebungHinzufuegen(Uebung uebung)
-+AllesDeaktivieren() 
-+Statusbericht() : string 
+    -uebungen : List<Uebung>
+    +Name : string {readOnly}
+    +AnzahlUebungen : int {readOnly}
+    +Trainingseinheit(name : string)
+    +UebungHinzufuegen(uebung : Uebung) : void
+    +AllesAktivieren() : void
+    +AllesDeaktivieren() : void
+    +Einstellen(einstellung : Einstellung) : void
+    +Statusbericht() : string
 }
 
+class Trainingsplan {
+    -_trainingseinheitList : List<Trainingseinheit>
+    +Bezeichnung : string {readOnly}
+    +AnzahlEinheiten : int {readOnly}
+    +Trainingsplan(bezeichnung : string)
+    +EinheitAnlegen(name : string) : Trainingseinheit
+    +AllesAktivieren() : void
+    +AllesDeaktivieren() : void
+    +Gesamtbericht() : string
+}
 
-Uebung <|-- Kraftuebung 
-Uebung <|-- Mobilityuebung 
-Uebung <|-- Laufeinheit 
+class Wettkampfwoche {
+    +Wettkampfwoche(name : string)
+}
+
+Uebung <|-- Kraftuebung
+Uebung <|-- Mobilityuebung
+Uebung <|-- Laufeinheit
 Uebung <|-- Schwimmeinheit
-ISensor <|.. Laufeinheit 
+
+ISensor <|.. Laufeinheit
 ISensor <|.. Mobilityuebung
 ISensor <|.. Schwimmeinheit
+
 Trainingseinheit "1" o-- "0..*" Uebung
+Trainingsplan "1" o-- "0..*" Trainingseinheit
+Trainingsplan <|-- Wettkampfwoche
 
-
-
+Uebung ..> Einstellung : verwendet
+Trainingseinheit ..> Einstellung : verwendet
 @enduml
