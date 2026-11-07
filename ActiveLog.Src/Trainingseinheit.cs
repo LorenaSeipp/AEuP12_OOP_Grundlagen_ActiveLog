@@ -5,7 +5,7 @@ public class Trainingseinheit
 
     public string Name { get; }
 
-    private List<Uebung> uebungen = new List<Uebung>();
+    protected List<Uebung> uebungen = new List<Uebung>(); 
     
     public int AnzahlUebungen { get; private set; }
 
@@ -29,6 +29,22 @@ public class Trainingseinheit
             uebung.Deaktivieren();
         }
     }
+    
+    public void AllesAktivieren()
+    {
+        foreach(Uebung uebung in uebungen)
+        {
+            uebung.Aktivieren();
+        }
+    }
+
+    public void Einstellen(Einstellung einstellung)
+    {
+        foreach (Uebung uebung in uebungen)
+        {
+            uebung.Einstellen(einstellung);
+        }
+    }
 
     public string Statusbericht()
     {
@@ -36,9 +52,9 @@ public class Trainingseinheit
         {
                 string uebungBericht = string.Join(Environment.NewLine,
                     uebungen.Select(u =>
-                        $"  - {u.Statuszeile()}"));
+                        $" - {u.Statuszeile()}"));
 
-            return $"Einheit {Name}:\n {uebungBericht}";
+            return $"Einheit {Name}:\n{uebungBericht}";
         }
 
         return $"Einheit {Name} hat keine Übungen.";

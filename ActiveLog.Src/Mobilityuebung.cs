@@ -4,7 +4,7 @@ public class Mobilityuebung : Uebung, ISensor
 {
     private DateTime? _startZeit;
 
-    public int SollDauerInSek { get; } = 120;
+    public int SollDauerInSek { get; private set; } = 120;
 
     public bool ZeitTrackingLaeuft { get; private set; }
 
@@ -85,6 +85,11 @@ public class Mobilityuebung : Uebung, ISensor
         {
             statuszeile = $"{Name}: aktiv ({Intensitaet} %)";
         }
+        
+        else if (IstAktiv && SollDauerInSek != 0)
+        {
+            statuszeile = $"{Name}: aktiv ({Intensitaet} % und Soll Dauer: {SollDauerInSek}s)";
+        }
 
         else
         {
@@ -97,5 +102,15 @@ public class Mobilityuebung : Uebung, ISensor
     public string LiesMesswert()
     {
         return $"{LetzteDauerInSek} sek";
+    }
+    
+    public override void Einstellen(Einstellung einstellung)
+    {
+        if (einstellung.SollDauerInSek != null)
+            SollDauerInSek = einstellung.SollDauerInSek.Value;
+        if (einstellung.Intensitaet != null)
+        {
+            Intensitaet = einstellung.Intensitaet.Value;
+        }
     }
 }

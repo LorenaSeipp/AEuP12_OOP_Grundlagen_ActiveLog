@@ -49,4 +49,10 @@ public class Laufeinheit : Uebung, ISensor
             _messwert = schlaege;
         }
     }
+    public override void Einstellen(Einstellung einstellung)
+    {
+        base.Einstellen(einstellung);
+        if (einstellung.Zielpuls != null)
+            Zielpuls = einstellung.Zielpuls.Value;
+    }
 }
