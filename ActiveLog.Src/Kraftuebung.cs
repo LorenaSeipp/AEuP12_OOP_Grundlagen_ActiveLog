@@ -25,4 +25,12 @@ public class Kraftuebung : Uebung
 
         return statuszeile;
     }
+
+    public override void Einstellen(Einstellung einstellung)
+    {
+        if (einstellung.Intensitaet != null)
+        {
+            Intensitaet = einstellung.Intensitaet.Value; 
+        }
+    }
 }

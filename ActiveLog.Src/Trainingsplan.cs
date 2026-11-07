@@ -2,29 +2,27 @@ namespace ActiveLog.Src;
 
 public class Trainingsplan
 {
-    private List<Trainingseinheit> _trainingseinheitList = new List<Trainingseinheit>();
-
-    private int _anzahlEinheiten;
+    protected List<Trainingseinheit> _trainingseinheitList = new List<Trainingseinheit>();
+    
     public string Bezeichnung { get; }
 
-    public int AnzahlEinheiten
-    {
-        get => _anzahlEinheiten;
-    }
+    public int AnzahlEinheiten => _trainingseinheitList.Count;
 
     public Trainingsplan(string bezeichnung)
     {
         Bezeichnung = bezeichnung;
     }
 
-    public Trainingseinheit EinheitAnlegen(string name)
-    {
-        Trainingseinheit trainingseinheit = new Trainingseinheit(name);
-        _trainingseinheitList.Add(trainingseinheit);
-        _anzahlEinheiten++;
+public Trainingseinheit EinheitAnlegen(string name)
+{
+    if (_trainingseinheitList.Any(t => t.Name == name))
+        throw new ArgumentException($"Einheit '{name}' existiert bereits.");
 
-        return trainingseinheit;
-    }
+    Trainingseinheit einheit = new Trainingseinheit(name);
+    _trainingseinheitList.Add(einheit);
+    
+    return einheit;
+}
 
     public void AllesDeaktivieren()
     {
@@ -33,10 +31,18 @@ public class Trainingsplan
             t.AllesDeaktivieren();
         }
     }
+    
+    public void AllesAktivieren()
+    {
+        foreach (Trainingseinheit t in _trainingseinheitList)
+        {
+            t.AllesAktivieren();
+        }
+    }
 
     public string Gesamtbericht()
     {
-        string gesamtbericht = $"Trainingsplan Musterplan Messe";
+        string gesamtbericht = $"Trainingsplan {Bezeichnung}";
 
         if (_trainingseinheitList.Count == 0)
         {

@@ -4,6 +4,8 @@ public class Schwimmeinheit : Uebung, ISensor
 {
     private int _anzahlBahnen = 0;
 
+    public int SollAnzahlBahnen { get; private set; }
+
     public int AnzahlBahnen
     {
         get => _anzahlBahnen;
@@ -22,6 +24,11 @@ public class Schwimmeinheit : Uebung, ISensor
         if (IstAktiv)
         {
             statuszeile = $"{Name}: aktiv ({_anzahlBahnen} Bahnen)";
+        }
+
+        else if (IstAktiv && SollAnzahlBahnen != 0)
+        {
+            statuszeile = $"{Name}: aktiv ({_anzahlBahnen} Bahnen geschwommen von {SollAnzahlBahnen})";
         }
         else
         {
@@ -44,5 +51,12 @@ public class Schwimmeinheit : Uebung, ISensor
         }
 
         return _anzahlBahnen;
+    }
+
+    public override void Einstellen(Einstellung einstellung)
+    {
+        base.Einstellen(einstellung);
+        if (einstellung.SollAnzahlBahnen != null)
+            SollAnzahlBahnen = einstellung.SollAnzahlBahnen.Value;
     }
 }

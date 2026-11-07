@@ -34,6 +34,11 @@ public abstract class Uebung
     {
         IstAktiv = false;
     }
+    
+    public virtual void Einstellen(Einstellung einstellung)
+    {
+        Aktivieren();
+    }
 
     public virtual string Statuszeile()
     {
